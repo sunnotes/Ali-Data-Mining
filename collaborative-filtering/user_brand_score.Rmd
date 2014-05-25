@@ -64,9 +64,53 @@ summary(user_brand$buy_num)
 ```{r}
 head(user_brand)
 
-user_brand$score <- apply(user_brand,1,computeScore)
+#通过函数调用失败，后期再调试
+#user_brand$score <- compute_click_score(user_brand$click_num)
+#user_brand$score <- apply(user_brand,1,computeScore)
+
+user_brand$score <- 0
+
+
+#click
+user_brand$temp <- 0
+user_brand$temp[user_brand$click_num == 1] <- 1
+user_brand$temp[user_brand$click_num == 2] <- 2
+user_brand$temp[user_brand$click_num == 3] <- 3
+user_brand$temp[user_brand$click_num > 3] <- 4
+user_brand$score<- user_brand$score+user_brand$temp
+
+#collect
+user_brand$temp <- 0
+user_brand$temp[user_brand$collect_num == 1] <- 1
+user_brand$temp[user_brand$collect_num == 2] <- 2
+user_brand$temp[user_brand$collect_num > 2] <- 4
+user_brand$score<- user_brand$score+user_brand$temp
+
+#cart
+user_brand$temp <- 0
+user_brand$temp[user_brand$cart_num == 1] <- 2
+user_brand$temp[user_brand$cart_num == 2] <- 4
+user_brand$score<- user_brand$score+user_brand$temp
+
+#buy
+user_brand$temp <- 0
+user_brand$temp[user_brand$buy_num == 1] <- 1
+user_brand$temp[user_brand$buy_num == 2] <- 2
+user_brand$temp[user_brand$buy_num > 2] <- 4
+user_brand$score<- user_brand$score+user_brand$temp
 
 table(user_brand$score)
+
+
+head(user_brand)
+dim(user_brand)
+user_brand_score <- user_brand[c(1,2,12)]
+head(user_brand_score)
+
+
+
+save(user_brand_score,file ='data/user_brand_score.RData')
+write.csv(user_brand_score,file="data/user_brand_score.csv")
 
 ```
 
@@ -81,6 +125,7 @@ computeScore <-function(data){
     compute_collect_score(data$collect_num) +
     compute_cart_score(data$cart_num) +
     compute_buy_score(data$buy_num)
+  
 }
 
 
