@@ -14,7 +14,7 @@ def loadResults(path=''):
     # First load book ratings into self.data
     #
     # f = codecs.open(path + "u.data", 'r', 'utf8')
-    f = codecs.open(path + "result.txt", 'r', 'ascii')
+    f = codecs.open(path + "result3.txt", 'r', 'ascii')
     #  f = open(path + "u.data")
     recomender = {}
     for line in f:
@@ -39,7 +39,7 @@ def loadReal(path=''):
     # First load book ratings into self.data
     #
     # f = codecs.open(path + "u.data", 'r', 'utf8')
-    f = codecs.open(path + "real.csv", 'r', 'ascii')
+    f = codecs.open(path + "real3.csv", 'r', 'ascii')
     #  f = open(path + "u.data")
     real = {}
     for line in f:
