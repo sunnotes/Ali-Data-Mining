@@ -118,13 +118,26 @@ UserBasedRecommender<-function(uid,n,M,S,N){
 ```
 5). 运行程序
 ```{r}
-FILE<-"./data/user_brand_score.csv"
+FILE<-"./data/user_brand_score_min.csv"
 NEIGHBORHOOD_NUM<-2
 RECOMMENDER_NUM<-3
 
 M<-FileDataModel(FILE)
 S<-EuclideanDistanceSimilarity(M)
 N<-NearestNUserNeighborhood(S,NEIGHBORHOOD_NUM)
+
+
+save(S,file ='data/S.RData')
+
+write.csv(S,file="data/S.csv")
+
+save(N,file ='data/N.RData')
+
+write.csv(N,file="data/N.csv")
+
+head(N,100)
+N
+
 
 R1<-UserBasedRecommender(1,RECOMMENDER_NUM,M,S,N);R1
 ##      [,1]  [,2]  
