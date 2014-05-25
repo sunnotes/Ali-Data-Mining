@@ -1,6 +1,6 @@
 #switch workspace
 oldwd <- getwd();
-setwd("/workspaces//git//Ali_Data_Mining")
+setwd("/mnt/hgfs/WorkSpaces/Ali-Data-Mining")
 
 
 data <- read.csv(file="./data/t_alibaba_data.csv",head=TRUE)
