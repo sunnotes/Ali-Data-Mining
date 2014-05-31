@@ -1,0 +1,224 @@
+Title
+========================================================
+
+brand similar
+
+```{r}
+head(user_brand)
+dim(user_brand)
+```
+
+
+
+以30天是否购买因变量，
+其余变量为自变量
+逻辑回归
+
+user_brand$is_buy[user_brand$last_30_day_buy_times > 0]  <-1
+user_brand$is_buy[user_brand$last_30_day_buy_times == 0]  <- 0
+user_brand$is_buy <- factor(user_brand$is_buy,
+                            levels = c(0,1),
+                            labels = c("No","Yes"))
+
+user_brand2 <- user_brand[-c(1,2,17)]
+head(user_brand2)
+
+logistic.fit <- glm(is_buy ~ .,
+  family = binomial(),
+	data = user_brand2);
+
+summary(logistic.fit)
+
+class(user_brand$is_buy)
+  
+
+sub_last_30_days_buy <- subset(user_brand,last_30_day_buy_times != 0)
+
+dim(sub_last_30_days_buy)
+head(sub_last_30_days_buy)
+
+
+3个月内
+1.点击数 click_num
+```{r}
+table(user_brand$click_num)
+summary(user_brand$click_num)
+summary(user_brand$click_buy_ratio)
+
+```
+  0次 0分
+  1次 1分
+  2次 2次
+  3次 3分
+  3次以上 4分
+
+2.是否收藏 collect_num
+```{r}
+table(user_brand$collect_num)
+summary(user_brand$collect_num)
+summary(user_brand$collect_buy_ratio)
+```
+  0次 0分
+  1次 1分
+  2次 2次
+  2次以上 4分
+
+3.是否购物车 cart_num
+```{r}
+table(user_brand$cart_num)
+summary(user_brand$cart_num)
+summary(user_brand$cart_buy_ratio)
+```
+  0次 0分
+  1次 2分
+  1次以上 4分
+  
+4.是否购买 buy_num
+```{r}
+table(user_brand$buy_num)
+summary(user_brand$buy_num)
+```
+  0次 0分
+  1次 1分
+  2次 2次
+  2次以上 4分
+
+
+计算评分
+```{r}
+head(user_brand)
+
+#通过函数调用失败，后期再调试
+#user_brand$score <- compute_click_score(user_brand$click_num)
+#user_brand$score <- apply(user_brand,1,computeScore)
+
+user_brand$score <- 0
+
+
+#click
+user_brand$temp <- 0
+user_brand$temp[user_brand$click_num == 1] <- 1
+user_brand$temp[user_brand$click_num == 2] <- 2
+user_brand$temp[user_brand$click_num == 3] <- 3
+user_brand$temp[user_brand$click_num > 3] <- 4
+user_brand$score<- user_brand$score+user_brand$temp
+
+#collect
+user_brand$temp <- 0
+user_brand$temp[user_brand$collect_num == 1] <- 1
+user_brand$temp[user_brand$collect_num == 2] <- 2
+user_brand$temp[user_brand$collect_num > 2] <- 4
+user_brand$score<- user_brand$score+user_brand$temp
+
+#cart
+user_brand$temp <- 0
+user_brand$temp[user_brand$cart_num == 1] <- 2
+user_brand$temp[user_brand$cart_num == 2] <- 4
+user_brand$score<- user_brand$score+user_brand$temp
+
+#buy
+user_brand$temp <- 0
+user_brand$temp[user_brand$buy_num == 1] <- 1
+user_brand$temp[user_brand$buy_num == 2] <- 2
+user_brand$temp[user_brand$buy_num > 2] <- 4
+user_brand$score<- user_brand$score+user_brand$temp
+
+table(user_brand$score)
+
+
+head(user_brand)
+dim(user_brand)
+user_brand_score <- user_brand[c(1,2,12)]
+head(user_brand_score)
+
+
+
+save(user_brand_score,file ='data/user_brand_score.RData')
+write.csv(user_brand_score,file="data/user_brand_score.csv")
+
+```
+
+
+
+
+
+
+```{r}
+computeScore <-function(data){
+  click_score <- compute_click_score(data$click_num) + 
+    compute_collect_score(data$collect_num) +
+    compute_cart_score(data$cart_num) +
+    compute_buy_score(data$buy_num)
+  
+}
+
+
+compute_click_score <- function(num) {
+    if(num == 1) {
+       2
+    }else if (num == 2) {
+       2
+    }else if (num == 3) {
+       3
+    }else if (num > 3) {
+       4
+    }else {
+       0
+    }
+}
+
+
+compute_collect_score <- function(num) {
+    if(num == 1) {
+       1
+    }else if (num == 2) {
+       2
+    }else if (num > 2) {
+       4
+    }else {
+       0
+    }
+}
+
+compute_cart_score <- function(num) {
+    if(num == 1) {
+       1
+    }else if (num > 1) {
+       4
+    }else {
+       0
+    }
+}
+
+compute_buy_score <- function(num) {
+    if(num == 1) {
+       1
+    }else if (num == 2) {
+       2
+    }else if (num > 2) {
+       4
+    }else {
+       0
+    }
+}
+
+
+
+
+
+
+x <- 1
+if (x ==1){
+     print('same')
+ } else if (x > 1){
+     print('bigger')
+ } else {
+     print('smaller')
+ }
+
+
+```
+  
+
+
+
