@@ -9,20 +9,20 @@ dim(rf_user_brand_train)
 #逻辑回归
 
 # 0-1
-rf_user_brand_train$is_buy[rf_user_brand_train$buy_times > 0]  <-1
+rf_user_brand_train$is_buy[rf_user_brand_train$buy_times > 0]  <- 1
 rf_user_brand_train$is_buy[rf_user_brand_train$buy_times == 0]  <- 0
 rf_user_brand_train$is_buy <- factor(rf_user_brand_train$is_buy,
                             levels = c(0,1),
                             labels = c("No","Yes"))
 #去除月份数,原因未知
-traindata <- rf_user_brand_train[-c(1,2,4,25)]
+traindata <- rf_user_brand_train[-c(1,2,24)]
 head(traindata)
 
 #树不平衡，需要解决
 table(traindata$is_buy)
 #   No   Yes 
 #27173   219 
-#随机抽取1%未购买的例子
+#随机抽取n%未购买的例子
 train_yes <- traindata[traindata$is_buy == "Yes",]
 dim(train_yes)
 train_no_total <- traindata[traindata$is_buy == "No",]
@@ -39,11 +39,11 @@ summary(rf.full)
 print(rf.full)
 
 
-#缩减模型
-rf.reduced <- randomForest(is_buy ~ lastday + last_3_day_click_times 
-                        + last_3_day_buy_times   + last_7_day_click_times 
-                        + last_7_day_buy_times + last_15_day_click_times
-  + total_click_times  + total_buy_times + total_collect_times
+#缩减模型 借用逻辑回归结果
+rf.reduced <- randomForest(is_buy ~ lastday + last_3_day_click_times + last_3_day_buy_times + 
+    last_7_day_click_times + last_7_day_buy_times + last_15_day_click_times + 
+    last_15_day_buy_times + total_click_times + total_buy_times + 
+    total_collect_times
   ,data = traindata_blance)
 
 ## 预测
@@ -52,7 +52,7 @@ testdata <- rf_user_brand_test
 testdata$yn <- predict(rf.reduced,newdata=testdata)
 head(testdata)
 dim(testdata)
-rf_predict_buy_yn <- subset(testdata,,c(1,2,26))
+rf_predict_buy_yn <- subset(testdata,,c(1,2,25))
 
 table(rf_predict_buy_yn$yn)
 ```
