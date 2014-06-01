@@ -1,0 +1,51 @@
+Title
+========================================================
+
+brand similar
+
+```{r}
+
+###评判分数
+
+head(testdata)
+
+
+###输出结果
+head(lr_predict_buy_prob)
+predict_buy <- subset(lr_predict_buy_prob,prob >= 0.15)
+predict_buy$predict_buy = 1
+predict_buy<- predict_buy[,-3]
+#head(predict_buy)
+dim(predict_buy)[1][1]
+#head(real_buy)
+#dim(real_buy)
+mrg <- merge(predict_buy,real_buy,all=TRUE)
+mrg[is.na(mrg)] = 0
+#head(mrg)
+#dim(mrg)
+precision <- dim(mrg[mrg$predict_buy == 1 & mrg$real_buy == 1,])[1][1]/dim(mrg[mrg$predict_buy == 1,])[1][1]
+precision
+recall <- dim(mrg[mrg$predict_buy == 1 & mrg$real_buy == 1,])[1][1]/dim(mrg[mrg$real_buy == 1,])[1][1]
+recall 
+F1 <- 2*precision*recall/(precision+recall)*100
+F1
+
+
+### pro 取不同值时/预测值/precision/recall/F1 score 值不一样
+
+0.5/63/0.1904762/0.008708273/1.66551
+0.3/89/0.1573034/0.01015965/1.908657
+0.1/237/0.1054852/0.01814224/3.095975
+0.01/4914/0.02564103/0.09143687/4.005086
+0.02/1672/0.04665072/0.05660377/5.114754   
+#去除month_count 提高精度
+0.02/823/0.07168894/0.04281567/5.361199
+
+复杂模型为
+0.02/882/0.06689342/0.06689342/5.221239
+0.0163/1273/0.05891595/0.05442671/5.658242
+```
+  
+
+
+

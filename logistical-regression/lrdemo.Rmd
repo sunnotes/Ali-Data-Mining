@@ -1,0 +1,112 @@
+---
+layout: post
+title: "使用R完成逻辑回归分类"
+description: ""
+category: statistics
+tags: [ 逻辑回归 , R,分类 ]
+---
+{% include JB/setup %}
+
+本文是R in action的学习笔记
+
+## 准备数据
+
+数据源自婚外情数据
+
+```{r}
+#install.packages("AER")
+library(AER)
+data(Affairs,package="AER")
+summary(Affairs)
+
+table(Affairs$affairs)
+```
+
+## 抽取因变量 0-1化
+
+```{r}
+Affairs$ynaffair[Affairs$affairs > 0 ] <- 1
+
+Affairs$ynaffair[Affairs$affairs == 0 ] <- 0
+
+table(Affairs$ynaffair)
+
+Affairs$ynaffair <- factor(Affairs$ynaffair,levels=c(0,1),labels=c("No","Yes"))
+
+table(Affairs$ynaffair)
+
+```
+## 建模拟合
+```{r}
+fit.full <- glm(ynaffair ~ gender + age + yearsmarried + children + religiousness 
+                + education + occupation + rating,
+                data =  Affairs,
+                family = binomial())
+
+summary(fit.full)
+```
+
+通过分析可知，性别等属性贡献不显著，可以去除
+
+## 去掉不显著的属性
+
+```{r}
+
+fit.reduced <- glm(ynaffair ~  age + yearsmarried +  religiousness + rating,
+                data =  Affairs,
+                family = binomial())
+
+summary(fit.reduced)
+
+```
+
+## 方差分析
+
+```{r}
+anova(fit.reduced,fit.full,test="Chisq")
+```
+卡方值为0.21 ，不显著，可以使用简单模型拟合
+
+## 模型解析
+```{r}
+exp(coef(fit.reduced))
+```
+
+## 预测
+
+构造虚拟数据
+```{r}
+testdata <- data.frame(rating = c(1,2,3,4,5),age = mean(Affairs$age),
+                       yearsmarried = mean(Affairs$yearsmarried),
+                       religiousness = mean(Affairs$religiousness))
+testdata
+testdataprob <- predict(fit.reduced,newdata=testdata,type="response")
+testdata
+
+```
+
+## 过度离势overdispersion
+
+判断方式  残差偏差/残差自由度
+```{r}
+#判断方式  残差偏差/残差自由度
+t = 615.36/596 = 1.03
+```
+没有过度离势
+拟合2次进行检查
+```{r}
+fit <- glm(ynaffair ~  age + yearsmarried +  religiousness + rating,
+                data =  Affairs,
+                family = binomial())
+fit.od <- glm(ynaffair ~  age + yearsmarried +  religiousness + rating,
+                data =  Affairs,
+                family = quasibinomial())
+
+pchisq(summary(fit.od)$dispersion * fit$df.residual , fit$df.residual , lower = F)
+
+
+
+```
+
+0.34 显然不显著
+没有出现过度离势
