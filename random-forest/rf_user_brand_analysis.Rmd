@@ -1,0 +1,19 @@
+Title
+========================================================
+
+
+```{r}
+head(lr_user_brand_train)
+rf_user_brand_train <- lr_user_brand_train
+rf_user_brand_test <- lr_user_brand_test
+
+
+
+
+
+
+
+
+```
+
+
