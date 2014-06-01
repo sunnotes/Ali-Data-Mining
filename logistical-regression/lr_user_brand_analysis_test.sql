@@ -106,16 +106,4 @@ AND visit_datetime < "2014-08-15"
 AND TYPE = 1
 GROUP BY user_id,brand_id)
 AS g 
-ON a.user_id = g.user_id AND a.brand_id = g.brand_id
-LEFT JOIN 
-(SELECT user_id,
- brand_id,
- COUNT(DISTINCT(MONTH(visit_datetime)))AS month_count 
- FROM t_alibaba_data 
- WHERE visit_datetime < "2014-07-15"
- GROUP BY user_id,brand_id)
-AS h 
-ON a.user_id = h.user_id AND a.brand_id = h.brand_id 
-
-
-
+ON a.user_id = g.user_id AND a.brand_id = g.br

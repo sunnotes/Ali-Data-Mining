@@ -24,7 +24,6 @@ lr_user_brand_train <- dbGetQuery(con,'SELECT
 a.user_id,
 a.brand_id,
                                   lastday,
-                                  month_count,
                                   last_3_day_click_times,
                                   last_3_day_buy_times,
                                   last_3_day_collect_times,
@@ -122,15 +121,7 @@ a.brand_id,
                                   GROUP BY user_id,brand_id)
                                   AS g 
                                   ON a.user_id = g.user_id AND a.brand_id = g.brand_id
-                                  LEFT JOIN 
-                                  (SELECT user_id,
-                                  brand_id,
-                                  COUNT(DISTINCT(MONTH(visit_datetime)))AS month_count 
-                                  FROM t_alibaba_data 
-                                  WHERE visit_datetime < "2014-06-15"
-                                  GROUP BY user_id,brand_id)
-                                  AS h 
-                                  ON a.user_id = h.user_id AND a.brand_id = h.brand_id ')
+                                   ')
 dim(lr_user_brand_train)
 head(lr_user_brand_train)
 lr_user_brand_train[is.na(lr_user_brand_train)] = 0
@@ -144,7 +135,6 @@ lr_user_brand_test <- dbGetQuery(con,'SELECT
 a.user_id,
 a.brand_id,
                                  lastday,
-                                 month_count,
                                  last_3_day_click_times,
                                  last_3_day_buy_times,
                                  last_3_day_collect_times,
@@ -241,16 +231,7 @@ a.brand_id,
                                  AND TYPE = 1
                                  GROUP BY user_id,brand_id)
                                  AS g 
-                                 ON a.user_id = g.user_id AND a.brand_id = g.brand_id
-                                 LEFT JOIN 
-                                 (SELECT user_id,
-                                 brand_id,
-                                 COUNT(DISTINCT(MONTH(visit_datetime)))AS month_count 
-                                 FROM t_alibaba_data 
-                                 WHERE visit_datetime < "2014-07-15"
-                                 GROUP BY user_id,brand_id)
-                                 AS h 
-                                 ON a.user_id = h.user_id AND a.brand_id = h.brand_id 
+                                 ON a.user_id = g.user_id AND a.brand_id = g.brand_id                               
                                   ')
 dim(lr_user_brand_test)
 head(lr_user_brand_test)

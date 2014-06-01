@@ -200,16 +200,4 @@ COUNT(CASE WHEN TYPE = 2 THEN 1  END) AS total_collect_times ,
 COUNT(CASE WHEN TYPE = 3 THEN 1  END) AS total_cart_times 
 FROM t_alibaba_data 
 WHERE visit_datetime < "2014-06-15"
-GROUP BY user_id,brand_id 
-LIMIT 100;
-
-##6.15 -- 7.15 购买次数
-
-SELECT user_id,brand_id,
-COUNT(1) AS buy_times 
-FROM t_alibaba_data 
-WHERE visit_datetime >= "2014-06-15"
-AND visit_datetime < "2014-07-15"
-AND TYPE = 1
-GROUP BY user_id,brand_id 
-LIMIT 100;
+GROUP 

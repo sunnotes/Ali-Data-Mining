@@ -12,7 +12,7 @@ head(testdata)
 
 ###输出结果
 head(lr_predict_buy_prob)
-predict_buy <- subset(lr_predict_buy_prob,prob >= 0.15)
+predict_buy <- subset(lr_predict_buy_prob,prob >= 0.017)
 predict_buy$predict_buy = 1
 predict_buy<- predict_buy[,-3]
 #head(predict_buy)
@@ -41,9 +41,16 @@ F1
 #去除month_count 提高精度
 0.02/823/0.07168894/0.04281567/5.361199
 
-复杂模型为
+#复杂模型为
 0.02/882/0.06689342/0.06689342/5.221239
 0.0163/1273/0.05891595/0.05442671/5.658242
+
+#step
+0.2/1653/0.04476709/0.05370102/4.882877
+0.18/1111/0.06480648/0.05224964/5.785456
+
+
+
 ```
   
 

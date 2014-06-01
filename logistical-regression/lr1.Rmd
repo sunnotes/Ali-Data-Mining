@@ -4,12 +4,13 @@ Title
 brand similar
 
 ```{r}
+
+## 读取数据
 lr_uer_brand_train <- load("./data/lr_user_brand_test.RData")
 head(lr_user_brand_train)
 dim(lr_user_brand_train)
 
 #逻辑回归
-
 # 0-1
 lr_user_brand_train$is_buy[lr_user_brand_train$buy_times > 0]  <-1
 lr_user_brand_train$is_buy[lr_user_brand_train$buy_times == 0]  <- 0
@@ -17,28 +18,33 @@ lr_user_brand_train$is_buy <- factor(lr_user_brand_train$is_buy,
                             levels = c(0,1),
                             labels = c("No","Yes"))
 
-#去除month 能提高精度，原因未知
-traindata <- lr_user_brand_train[-c(1,2,4,25)]
+traindata <- lr_user_brand_train[-c(1,2,24)]
 head(traindata)
 
 #建模
 logistic.full <- glm(is_buy ~ .,
-  family = binomial(),
-	data = traindata);
+    family = binomial(),
+	  data = traindata)
 summary(logistic.full)
 
 ##缩减模型
+#取消不显著的变量
 logistic.reduced <- glm(is_buy ~ lastday + last_3_day_click_times 
                         + last_3_day_buy_times   + last_7_day_click_times 
                         + last_7_day_buy_times + last_15_day_click_times
-  + total_click_times  + total_buy_times + total_collect_times,
-  family = binomial(),
-  data = traindata);
+                        + total_click_times  +  total_collect_times,
+                        family = binomial(),
+                        data = traindata)
 summary(logistic.reduced)
+
+
+##step模型
+logistic.step <- step(logistic.full,direction="both")
+summary(logistic.step)
 
 ##方差分析
 anova(logistic.reduced,logistic.full,test="Chisq")
-
+anova(logistic.reduced,logistic.step,test="Chisq")
 ##可以采用简单模型
 
 #使用简单模型预测
@@ -46,16 +52,21 @@ testdata <- lr_user_brand_test
 testdata$prob <- predict(logistic.reduced,newdata=testdata,type="response")
 head(testdata)
 dim(testdata)
-lr_predict_buy_prob <- subset(testdata,,c(1,2,26))
-
-save(lr_predict_buy_prob,file ='data/lr_predict_buy_prob.RData')
-write.csv(lr_predict_buy_prob,file="data/lr_predict_buy_prob.csv")
+lr_predict_buy_prob <- subset(testdata,,c(1,2,25))
 
 
 #使用复杂模型预测
 testdata <- lr_user_brand_test
 testdata$prob <- predict(logistic.full,newdata=testdata,type="response")
-lr_predict_buy_prob <- subset(testdata,,c(1,2,26))
+lr_predict_buy_prob <- subset(testdata,,c(1,2,25))
+
+#使用step模型预测
+testdata <- lr_user_brand_test
+testdata$prob <- predict(logistic.step,newdata=testdata,type="response")
+lr_predict_buy_prob <- subset(testdata,,c(1,2,25))
+
+save(lr_predict_buy_prob,file ='data/lr_predict_buy_prob.RData')
+write.csv(lr_predict_buy_prob,file="data/lr_predict_buy_prob.csv")
 
 
 ```

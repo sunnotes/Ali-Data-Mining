@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "使用R完成逻辑回归分类"
+title: "使用R实现逻辑回归分类"
 description: ""
 category: statistics
 tags: [ 逻辑回归 , R,分类 ]
@@ -15,7 +15,7 @@ tags: [ 逻辑回归 , R,分类 ]
 
 ```{r}
 #install.packages("AER")
-library(AER)
+#library(AER)
 data(Affairs,package="AER")
 summary(Affairs)
 
@@ -80,7 +80,7 @@ testdata <- data.frame(rating = c(1,2,3,4,5),age = mean(Affairs$age),
                        yearsmarried = mean(Affairs$yearsmarried),
                        religiousness = mean(Affairs$religiousness))
 testdata
-testdataprob <- predict(fit.reduced,newdata=testdata,type="response")
+testdata$prob <- predict(fit.reduced,newdata=testdata,type="response")
 testdata
 
 ```
