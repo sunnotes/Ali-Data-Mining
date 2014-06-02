@@ -1,0 +1,85 @@
+---
+layout: post
+title: "使用R实现贝叶斯"
+description: ""
+category: statistics
+tags: [ 贝叶斯 , R ]
+---
+{% include JB/setup %}
+
+转自 http://xccds.github.io/2012/07/blog-post.html/
+
+朴素贝叶斯分类（Naive Bayes Classifier）是一种简单而容易理解的分类方法，看起来很Naive，但用起来却很有效。其原理就是贝叶斯定理，从数据中得到新的信息，然后对先验概率进行更新，从而得到后验概率。好比说我们判断一个人的品质好坏，对于陌生人我们对他的判断是五五开，如果说他做了一件好事，那么这个新的信息使我们判断他是好人的概率增加了。朴素贝叶斯分类的优势在于不怕噪声和无关变量，其Naive之处在于它假设各特征属性是无关的。而贝叶斯网络（Bayesian Network）则放宽了变量无关的假设，将贝叶斯原理和图论相结合，建立起一种基于概率推理的数学模型,对于解决复杂的不确定性和关联性问题有很强的优势。下面我们用mlbench包中的一个数据集来看看如何用这两种方法进行学习训练。
+
+PimaIndiansDiabetes2是美国一个疾病研究机构所拥有的一个数据集，其中包括了9个变量，共有768个样本。响应变量即是对糖尿病的判断，它是一个二元变量。其它各解释变量是个体的若干特征，如年龄和其它医学指标，均为数值变量。其中有一些缺失值的存在，虽然朴素贝叶斯分类对于缺失值并不敏感，我们还是先将其进行插补，再进行建模以观察准确率。R语言中的e1071包中就有可以实施朴素贝叶斯分类的函数，但在本例我们使用klaR包中的NaiveBayes函数，因为该函数较之前者增加了两个功能，一个是可以输入先验概率，另一个是在正态分布基础上增加了核平滑密度函数。为了避免过度拟合，在训练时还要将数据分割进行多重检验，所以我们还使用了caret包的一些函数进行配合。
+
+
+
+```{r}
+# 加载扩展包和数据
+#install.packages("caret")
+#install.packages("mlbench")
+#install.packages("ipred")
+#install.packages("e1071")
+library(caret)
+library(mlbench)
+library(ipred)
+library(e1071)
+data(PimaIndiansDiabetes2,package='mlbench')
+head(PimaIndiansDiabetes2)
+summary(PimaIndiansDiabetes2)
+
+# 对缺失值使用装袋方法进行插补
+preproc <- preProcess(PimaIndiansDiabetes2[-9],method="bagImpute")
+data <- predict(preproc,PimaIndiansDiabetes2[-9])
+data$Class <- PimaIndiansDiabetes2[,9]
+# 使用朴素贝叶斯建模，这里使用了三次10折交叉检验得到30个结果
+fitControl <- trainControl(method = "repeatedcv", number = 10, repeats = 3,returnResamp = "all")
+model1 <- train(Class~., data=data,method='nb',trControl = fitControl,tuneGrid = data.frame(.fL=1,.usekernel=F))
+
+# 观察30次检验结果，发现准确率在0.75左右
+resampleHist(model1)
+# 返回训练数据的混淆矩阵
+pre <- predict(model1)
+confusionMatrix(pre,data$Class)
+
+
+```
+
+贝叶斯网络的建立可以根据主观知识或是客观数据。建模分为两个步骤，第一个步骤是结构学习，也就是创建网络拓扑结构。第二个步骤是参数学习，即估计出各节点的条件概率表。训练完成之后就可以利用贝叶斯网络来进行推断和预测。R语言中可以使用bnlearn包来完成上述这些工作。但要注意的是，bnlearn包不能处理混合数据，所以先将连续数据进行离散化，再进行建模训练。
+
+```{r}
+# 加载包
+#install.packages("bnlearn")
+library(bnlearn)
+# 数据离散化
+data2 <- discretize(data[-9],method='quantile')
+head(data2)
+head(data)
+data2$class <- data[,9]
+# 使用爬山算法进行结构学习
+bayesnet <- hc(data2)
+# 显示网络图
+plot(bayesnet)
+# 修改网络图中的箭头指向
+bayesnet<- set.arc(bayesnet,'age','pregnant')
+# 参数学习
+fitted <- bn.fit(bayesnet, data2,method='mle')
+# 训练样本预测并提取混淆矩阵
+pre <- predict(fitted,data=data2,node='class')
+confusionMatrix(pre,data2$class)
+# 进行条件推理
+cpquery(fitted,(class=='pos'),(age=='(36,81]'&mass=='(34.8,67.1]'))
+
+```
+
+
+从最后的预测精度来看，两种学习方法的效果差不多，但贝叶斯网络的优势在于：
+
+对缺失数据不敏感
+可以学习因果关系，加深对数据的理解
+能将先验知识融入建模
+避免了过度拟合问题，不需要保留数据进行检验
+
+
+

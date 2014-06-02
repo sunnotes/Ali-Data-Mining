@@ -1,0 +1,74 @@
+---
+layout: post
+title: "使用R实现贝叶斯"
+description: ""
+category: statistics
+tags: [ 贝叶斯 , R ]
+---
+{% include JB/setup %}
+
+
+
+## 算法大概
+
+朴素贝叶斯法大概是最简单的一种挖掘算法了，《统计学习方法》在第四章做了很详细的叙述，无非是对于输入特征x，利用通过学习得到的模型计算后验概率分布，将后验概率最大的分类作为输出。
+根据贝叶斯定理，后验概率P(Y=cx | X=x) = 条件概率P(X=x | Y=cx) * 先验概率P(Y = ck) / P(X=x)，取P(X=x | Y=cx) * P(Y = ck)最大的分类作为输出。
+
+
+```{r}
+#构造训练集  
+data <- matrix(c("sunny","hot","high","weak","no",  
+                 "sunny","hot","high","strong","no",  
+                 "overcast","hot","high","weak","yes",  
+                 "rain","mild","high","weak","yes",  
+                 "rain","cool","normal","weak","yes",  
+                 "rain","cool","normal","strong","no",  
+                 "overcast","cool","normal","strong","yes",  
+                 "sunny","mild","high","weak","no",  
+                 "sunny","cool","normal","weak","yes",  
+                 "rain","mild","normal","weak","yes",  
+                 "sunny","mild","normal","strong","yes",  
+                 "overcast","mild","high","strong","yes",  
+                 "overcast","hot","normal","weak","yes",  
+                 "rain","mild","high","strong","no"), byrow = TRUE,  
+               dimnames = list(day = c(),  
+               condition = c("outlook","temperature",  
+                 "humidity","wind","playtennis")), nrow=14, ncol=5);  
+head(data)
+dim(data)
+#计算先验概率  
+prior.yes = sum(data[,5] == "yes") / length(data[,5]);  
+prior.no  = sum(data[,5] == "no")  / length(data[,5]);  
+  
+#模型  
+naive.bayes.prediction <- function(condition.vec) {  
+    # Calculate unnormlized posterior probability for playtennis = yes.  
+    playtennis.yes <-  
+        sum((data[,1] == condition.vec[1]) & (data[,5] == "yes")) / sum(data[,5] == "yes") * # P(outlook = f_1 | playtennis = yes)  
+        sum((data[,2] == condition.vec[2]) & (data[,5] == "yes")) / sum(data[,5] == "yes") * # P(temperature = f_2 | playtennis = yes)  
+        sum((data[,3] == condition.vec[3]) & (data[,5] == "yes")) / sum(data[,5] == "yes") * # P(humidity = f_3 | playtennis = yes)  
+        sum((data[,4] == condition.vec[4]) & (data[,5] == "yes")) / sum(data[,5] == "yes") * # P(wind = f_4 | playtennis = yes)  
+        prior.yes; # P(playtennis = yes)  
+  
+    # Calculate unnormlized posterior probability for playtennis = no.  
+    playtennis.no <-  
+        sum((data[,1] == condition.vec[1]) & (data[,5] == "no"))  / sum(data[,5] == "no")  * # P(outlook = f_1 | playtennis = no)  
+        sum((data[,2] == condition.vec[2]) & (data[,5] == "no"))  / sum(data[,5] == "no")  * # P(temperature = f_2 | playtennis = no)  
+        sum((data[,3] == condition.vec[3]) & (data[,5] == "no"))  / sum(data[,5] == "no")  * # P(humidity = f_3 | playtennis = no)  
+        sum((data[,4] == condition.vec[4]) & (data[,5] == "no"))  / sum(data[,5] == "no")  * # P(wind = f_4 | playtennis = no)  
+        prior.no; # P(playtennis = no)  
+      
+    return(list(post.pr.yes = playtennis.yes,  
+            post.pr.no  = playtennis.no,  
+            prediction  = ifelse(playtennis.yes >= playtennis.no, "yes", "no")));  
+}  
+  
+#预测  
+naive.bayes.prediction(c("rain",     "hot",  "high",   "strong"));  
+naive.bayes.prediction(c("sunny",    "mild", "normal", "weak"));  
+naive.bayes.prediction(c("overcast", "mild", "normal", "weak")); 
+```
+
+
+
+

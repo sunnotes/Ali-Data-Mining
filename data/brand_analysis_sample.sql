@@ -36,3 +36,12 @@ SELECT brand_id,
  WHERE visit_datetime < "2014-06-15"
  GROUP BY brand_id
 LIMIT 100
+
+
+#最后一次活动时间
+SELECT user_id,brand_id,MAX(visit_datetime)
+AS lastday 
+ FROM t_alibaba_data 
+ GROUP BY user_id,brand_id 
+ LIMIT 100;
+ 

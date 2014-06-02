@@ -1,0 +1,56 @@
+Title
+========================================================
+
+
+
+```{r}
+
+bayes_user_brand_train <- lr_user_brand_train
+bayes_user_brand_test <- lr_user_brand_test
+
+# 0-1
+bayes_user_brand_train$is_buy[bayes_user_brand_train$buy_times > 0]  <- 1
+bayes_user_brand_train$is_buy[bayes_user_brand_train$buy_times == 0]  <- 0
+bayes_user_brand_train$is_buy <- factor(bayes_user_brand_train$is_buy,
+                            levels = c(0,1),
+                            labels = c("No","Yes"))
+
+traindata <- bayes_user_brand_train[-c(1,2,24)]
+head(traindata)
+dim(traindata)
+
+# 数据处理
+preproc <- preProcess(traindata[-22],method="bagImpute")
+data <- predict(preproc,traindata[-22])
+# 使用朴素贝叶斯建模，这里使用了三次10折交叉检验得到30个结果
+fitControl <- trainControl(method = "repeatedcv", number = 10, repeats = 3,returnResamp = "all")
+model1 <- train( is_buy~., data=traindata,method='nb',trControl = fitControl,tuneGrid = data.frame(.fL=1,.usekernel=F))
+
+# 观察30次检验结果，发现准确率在0.75左右
+resampleHist(model1)
+# 返回训练数据的混淆矩阵
+pre <- predict(model1)
+confusionMatrix(pre,data$Class)
+
+
+#建模
+traindata2 <- discretize(traindata[-22],method='quantile')
+# 使用爬山算法进行结构学习
+bayesnet <- hc(traindata2)
+# 显示网络图
+plot(bayesnet)
+
+# 修改网络图中的箭头指向
+bayesnet<- set.arc(bayesnet,'age','pregnant')
+# 参数学习
+fitted <- bn.fit(bayesnet, traindata2,method='mle')
+# 训练样本预测并提取混淆矩阵
+pre <- predict(fitted,data=data2,node='class')
+confusionMatrix(pre,data2$class)
+# 进行条件推理
+cpquery(fitted,(class=='pos'),(age=='(36,81]'&mass=='(34.8,67.1]'))
+
+
+```
+
+
