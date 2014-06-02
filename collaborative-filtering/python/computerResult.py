@@ -14,7 +14,7 @@ def loadResults(path=''):
     # First load book ratings into self.data
     #
     # f = codecs.open(path + "u.data", 'r', 'utf8')
-    f = codecs.open(path + "result3.txt", 'r', 'ascii')
+    f = codecs.open(path + "result.txt", 'r', 'ascii')
     #  f = open(path + "u.data")
     recomender = {}
     for line in f:
@@ -39,7 +39,7 @@ def loadReal(path=''):
     # First load book ratings into self.data
     #
     # f = codecs.open(path + "u.data", 'r', 'utf8')
-    f = codecs.open(path + "real3.csv", 'r', 'ascii')
+    f = codecs.open(path + "real.csv", 'r', 'ascii')
     #  f = open(path + "u.data")
     real = {}
     for line in f:
@@ -89,8 +89,8 @@ def F(rec, real):
     
 
 if __name__ == '__main__':
-    recommender = loadResults('C:\DEV\WorkSpaces\Ali-Data-Mining\python\data\\')
-    real = loadReal('C:\DEV\WorkSpaces\Ali-Data-Mining\python\data\\')
+    recommender = loadResults('C:\DEV\WorkSpaces\Ali-Data-Mining\collaborative-filtering\python\data\\')
+    real = loadReal('C:\DEV\WorkSpaces\Ali-Data-Mining\collaborative-filtering\python\data\\')
     # print(recommender)
     # print(real)
     print(F(recommender, real))

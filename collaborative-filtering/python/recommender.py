@@ -70,7 +70,7 @@ class recommender:
       # First load book ratings into self.data
       #
       # f = codecs.open(path + "u.data", 'r', 'utf8')
-      f = codecs.open(path + "user_brand_score.csv", 'r', 'ascii')
+      f = codecs.open(path + "cf_score.csv", 'r', 'ascii')
       #  f = open(path + "u.data")
       for line in f:
          i += 1
@@ -168,7 +168,7 @@ class recommender:
 # 仅推荐分数超过5分的
       better ={};
       for (k, v) in recommendations:       
-           if(v > 5):
+           if(v > 4):
                better[k] = v
       return better
     
@@ -263,7 +263,7 @@ class recommender:
 
 ####################
 r = recommender(0)
-r.loadMovieLens('C:\DEV\WorkSpaces\Ali-Data-Mining\python\data\\')
+r.loadMovieLens('C:\DEV\WorkSpaces\Ali-Data-Mining\collaborative-filtering\python\data\\')
 #print("####################")
 #r.showUserTopItems('19500', 10)
 #print("####################")
@@ -272,13 +272,13 @@ print("####################")
 
 #print(r.slopeOneRecommendations(r.data['10000250']))
 #print(r.slopeOneRecommendations(r.data['19500']))
-file_object = open('C:\DEV\WorkSpaces\Ali-Data-Mining\python\data\\result.txt', 'w')
+#file_object = open('C:\result.txt', 'w')
 for id in r.user:
     recommend = r.slopeOneRecommendations(r.data[id])
     all_the_text = ""
     if len(recommend) != 0:
-        all_the_text = id + "\t"+ str(recommend.keys())+"\n"  
-        file_object.write(all_the_text)
-        
-file_object.close( )
+        all_the_text = id + "\t"+ str(recommend.keys()) 
+        #file_object.write(all_the_text)
+        print(all_the_text)
+#file_object.close( )
                                 

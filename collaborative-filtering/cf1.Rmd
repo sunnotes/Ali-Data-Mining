@@ -1,0 +1,166 @@
+Title
+========================================================
+
+brand similar
+
+```{r}
+
+head(cf_train)
+dim(cf_train)
+
+
+
+```
+
+
+简化计算，
+取以下属性
+last_3_day_click_times 
++ last_3_day_buy_times   + last_7_day_click_times 
++ last_7_day_buy_times + last_15_day_click_times
++ total_click_times  +  total_collect_times
+简化记分规则
+0 记0分
+1 记1分
+
+```{r}
+#通过函数调用失败，后期再调试
+#user_brand$score <- compute_click_score(user_brand$click_num)
+#user_brand$score <- apply(user_brand,1,computeScore)
+
+cf_train$score <- 0
+
+#last_3_day_click_times 
+cf_train$temp <- 0
+cf_train$temp[cf_train$last_3_day_click_times > 0] <- 1
+cf_train$score<- cf_train$score + cf_train$temp
+
+#last_3_day_buy_times
+cf_train$temp <- 0
+cf_train$temp[cf_train$last_3_day_buy_times > 0] <- 1
+cf_train$score<- cf_train$score + cf_train$temp
+
+#last_7_day_click_times
+cf_train$temp <- 0
+cf_train$temp[cf_train$last_7_day_click_times > 0] <- 1
+cf_train$score<- cf_train$score + cf_train$temp
+
+#last_7_day_buy_times 
+cf_train$temp <- 0
+cf_train$temp[cf_train$last_7_day_buy_times  > 0] <- 1
+cf_train$score<- cf_train$score + cf_train$temp
+
+#last_15_day_click_times
+cf_train$temp <- 0
+cf_train$temp[cf_train$last_15_day_click_times > 0] <- 1
+cf_train$score<- cf_train$score + cf_train$temp
+
+#total_click_times  
+cf_train$temp <- 0
+cf_train$temp[cf_train$total_click_times   > 0] <- 1
+cf_train$score<- cf_train$score + cf_train$temp
+
+#total_collect_times
+cf_train$temp <- 0
+cf_train$temp[cf_train$total_collect_times > 0] <- 1
+cf_train$score<- cf_train$score + cf_train$temp
+
+head(cf_train)
+dim(cf_train)
+
+table(cf_train$score)
+
+cf_score <- cf_train[c(1,2,13)]
+
+head(cf_score)
+dim(cf_score)
+
+save(cf_score,file ='data/cf_score.RData')
+write.csv(cf_score,file="data/cf_score.csv")
+
+```
+
+
+
+
+
+
+```{r}
+computeScore <-function(data){
+  click_score <- compute_click_score(data$click_num) + 
+    compute_collect_score(data$collect_num) +
+    compute_cart_score(data$cart_num) +
+    compute_buy_score(data$buy_num)
+  
+}
+
+
+compute_click_score <- function(num) {
+    if(num == 1) {
+       2
+    }else if (num == 2) {
+       2
+    }else if (num == 3) {
+       3
+    }else if (num > 3) {
+       4
+    }else {
+       0
+    }
+}
+
+
+compute_collect_score <- function(num) {
+    if(num == 1) {
+       1
+    }else if (num == 2) {
+       2
+    }else if (num > 2) {
+       4
+    }else {
+       0
+    }
+}
+
+compute_cart_score <- function(num) {
+    if(num == 1) {
+       1
+    }else if (num > 1) {
+       4
+    }else {
+       0
+    }
+}
+
+compute_buy_score <- function(num) {
+    if(num == 1) {
+       1
+    }else if (num == 2) {
+       2
+    }else if (num > 2) {
+       4
+    }else {
+       0
+    }
+}
+
+
+
+
+
+
+x <- 1
+if (x ==1){
+     print('same')
+ } else if (x > 1){
+     print('bigger')
+ } else {
+     print('smaller')
+ }
+
+
+```
+  
+
+
+

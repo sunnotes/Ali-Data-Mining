@@ -3,9 +3,9 @@ oldwd <- getwd();
 setwd("/mnt/hgfs/WorkSpaces/Ali-Data-Mining")
 
 ###########windows
-#install.packages("RODBC")
-#library(RODBC)
-#conn <- odbcConnect('alidata')
+install.packages("RODBC")
+library(RODBC)
+conn <- odbcConnect('alidata')
 
 ########Linux
 #install.packages("RMySQL")

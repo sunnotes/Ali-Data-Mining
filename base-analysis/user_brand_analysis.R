@@ -87,7 +87,7 @@ user_brand$cart_buy_ratio <-  user_brand$buy_num/user_brand$cart_num
 
 user_brand[is.na(user_brand)] = 0
 
-user_brand <- user_brand[-c(5,6,7)]
+#user_brand <- user_brand[-c(5,6,7)]
 
 dim(user_brand)
 head(user_brand)
